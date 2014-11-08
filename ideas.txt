@@ -1,0 +1,9 @@
+-- classifier for type of crime based on time of day, location etc.
+-- look at particular type of crime (say vehicle theft) and look for trends (and hopefully finally predict)
+-- twitter data --> difference between twitter time and police report time
+-- cross income / demographics data with crime data
+-- Yelp data (how late things are open) vs. crime
+----> hours
+----> prices
+----> reviews
+----> ratings

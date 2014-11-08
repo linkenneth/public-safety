@@ -1,0 +1,11 @@
+.DS_Store
+*.swp
+\#*\#
+*~
+auto/
+
+# LaTeX stuff
+*.log
+*.synctex.gz
+*.out
+*.aux
