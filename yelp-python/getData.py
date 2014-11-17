@@ -142,7 +142,7 @@ SEARCH_TERM = "food"
 QUERY_LIMIT = 1500
 
 start_time = time.time()
-df = pd.read_csv('{}/{}' % (DATA_PATH, FILE_NAME))
+df = pd.read_csv('%s/%s' % (DATA_PATH, FILE_NAME))
 
 for i, row in df.iterrows():
     if i >= QUERY_LIMIT:
