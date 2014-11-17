@@ -27,6 +27,7 @@ import oauth2
 import pandas as pd
 import pymongo
 import time
+import random
 
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'food'
@@ -139,7 +140,7 @@ db = client['yelp_db']
 DATA_PATH = "../sf-city-data/sfpd-reported-incidents-2003-to-present"
 FILE_NAME = "sfpd_incident_2014.csv"
 SEARCH_TERM = "food"
-QUERY_LIMIT = 1500
+QUERY_LIMIT = 12000
 
 start_time = time.time()
 df = pd.read_csv('%s/%s' % (DATA_PATH, FILE_NAME))
