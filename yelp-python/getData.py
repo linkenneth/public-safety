@@ -26,6 +26,7 @@ import oauth2
 
 import pandas as pd
 import pymongo
+import time
 
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'food'
@@ -135,12 +136,12 @@ def query_api(term, location):
 client = pymongo.MongoClient()
 db = client['yelp_db']
 
-DATA_PATH = "../sf-city-data/sfpd-reported-incidents-2003-to-present/"
+DATA_PATH = "../sf-city-data/sfpd-reported-incidents-2003-to-present"
 FILE_NAME = "sfpd_incident_2014.csv"
 SEARCH_TERM = "food"
+QUERY_LIMIT = 1500
 
-QUERY_LIMIT = 150
-
+start_time = time.time()
 df = pd.read_csv('{}/{}' % (DATA_PATH, FILE_NAME))
 
 for i, row in df.iterrows():
@@ -157,15 +158,18 @@ for i, row in df.iterrows():
     location = str(latitude) + ',' + str(longitude)
 
     if i % (QUERY_LIMIT / 100) == 0:
-        print '-- %.2f%% complete -- %d / %d --' % (
-            float(i) / QUERY_LIMIT * 100, i, QUERY_LIMIT
+        print '-- %.2f%% complete -- %d / %d -- %.2fs taken' % (
+            float(i) / QUERY_LIMIT * 100, i, QUERY_LIMIT, time.time() - start_time
         )
+
+    if i % (QUERY_LIMIT / 500) == 0:
+        time.sleep(random.random() / 2)  # to avoid rate-limiting
 
     try:
         result = query_api(SEARCH_TERM, location)
         document = {'incidentNum': incidentNum, 'restaurants': result}
         db.restaurants.insert(document)
-    except e:
+    except Exception as e:
         print 'ERROR occurred during API query'
         print '== element number: %d == incident number: %d ==' % (i, incidentNum)
         raise e
