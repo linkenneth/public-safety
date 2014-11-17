@@ -25,7 +25,7 @@ import urllib2
 import oauth2
 
 import pandas as pd
-#from pymongo import MongoClient
+from pymongo import MongoClient
 
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'food'
@@ -132,25 +132,28 @@ def query_api(term, location):
     return businesses
 
 
-#client = MongoClient()
-#db = client['yelp_db']
+client = MongoClient()
+db = client['yelp_db']
 
 path = "../sf-city-data/sfpd-reported-incidents-2003-to-present/"
 name = "sfpd_incident_2003.csv"
 fileloc = path + name
 find = "food"
 df = pd.read_csv(fileloc)
-i = 0
-for item in df.iterrows():
-    i += 1
+
+for i, item in df.iterrows():
     if i > 150:
-      break
-    item = item[1]
+        break
     a = item.Y
     b = item.X
     loc = str(a) + ',' + str(b)
-    result = query_api(find, loc)
-    put = {"incidentNum": item.IncidntNum, "restaurants": result}
-    print put
-    #db.restaurants.insert(put)
-    
+
+    if i % 10:
+        print 'Working on crime #%s' % i
+
+    try:
+        result = query_api(find, loc)
+        put = {"incidentNum": item.IncidntNum, "restaurants": result}
+        db.restaurants.insert(put)
+    except:
+        print 'Error in API query on element %d' % i
