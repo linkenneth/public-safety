@@ -5,4 +5,6 @@ We are planning to look at the location (longitude and latitude) of crimes we ge
 1. Keep track of number of times a restaurant comes up in the queries, give some information on how probable crime is near a certain restaurant.
 2. Gain information about correlation between yelp ratings around a crime. We will average the restaurants around a crime to get a restaurant score assigned to that crime area.  From there we will compare that review to some sort of baseline for average restaurant ratings in San Francisco.  
 3. Look at different types of crime (ie. violent vs non violent) and see how the average restaurant rating compares between them. 
-4. Consider the fact of non reported crimes and how that may affect our results. 
+4. Consider the fact of non reported crimes and how that may affect our results.
+
+We found that several incidents in the crime data could have the same incident number which we at first assumed to be unique.  We just skipped over them because from the cases we physically looked at in the data, all the crimes were very related and had the same location. (Ex. multiple drug and narcatics charges) 
