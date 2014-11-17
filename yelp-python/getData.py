@@ -25,13 +25,13 @@ import urllib2
 import oauth2
 
 import pandas as pd
-from pymongo import MongoClient
+import pymongo
 
 API_HOST = 'api.yelp.com'
 DEFAULT_TERM = 'food'
 DEFAULT_LOCATION = 'SanFrancisco,CA'
 SEARCH_LIMIT = 20
-SORT = 1;
+SORT = 1  # by distance
 SEARCH_PATH = '/v2/search/'
 BUSINESS_PATH = '/v2/business/'
 
@@ -132,28 +132,40 @@ def query_api(term, location):
     return businesses
 
 
-client = MongoClient()
+client = pymongo.MongoClient()
 db = client['yelp_db']
 
-path = "../sf-city-data/sfpd-reported-incidents-2003-to-present/"
-name = "sfpd_incident_2003.csv"
-fileloc = path + name
-find = "food"
-df = pd.read_csv(fileloc)
+DATA_PATH = "../sf-city-data/sfpd-reported-incidents-2003-to-present/"
+FILE_NAME = "sfpd_incident_2014.csv"
+SEARCH_TERM = "food"
 
-for i, item in df.iterrows():
-    if i > 150:
+QUERY_LIMIT = 150
+
+df = pd.read_csv('{}/{}' % (DATA_PATH, FILE_NAME))
+
+for i, row in df.iterrows():
+    if i >= QUERY_LIMIT:
         break
-    a = item.Y
-    b = item.X
-    loc = str(a) + ',' + str(b)
 
-    if i % 10:
-        print 'Working on crime #%s' % i
+    incidentNum = row.IncidntNum
+    exists = db.restaurants.find_one({ 'incidentNum': incidentNum })
+    if exists:
+        print 'Duplicate incident number: %d. Skipping...' % incidentNum
+        continue
+
+    longitude, latitude = row.X, row.Y
+    location = str(latitude) + ',' + str(longitude)
+
+    if i % (QUERY_LIMIT / 100) == 0:
+        print '-- %.2f%% complete -- %d / %d --' % (
+            float(i) / QUERY_LIMIT * 100, i, QUERY_LIMIT
+        )
 
     try:
-        result = query_api(find, loc)
-        put = {"incidentNum": item.IncidntNum, "restaurants": result}
-        db.restaurants.insert(put)
-    except:
-        print 'Error in API query on element %d' % i
+        result = query_api(SEARCH_TERM, location)
+        document = {'incidentNum': incidentNum, 'restaurants': result}
+        db.restaurants.insert(document)
+    except e:
+        print 'ERROR occurred during API query'
+        print '== element number: %d == incident number: %d ==' % (i, incidentNum)
+        raise e
