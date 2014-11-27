@@ -12,3 +12,6 @@ auto/
 
 # Yelp API keys
 yelp-python/*.key
+
+# Yelp Academic Dataset
+yelp-data/
