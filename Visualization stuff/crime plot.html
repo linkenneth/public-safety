@@ -14,6 +14,7 @@
       .stations circle{
         stroke: black;
         stroke-width: 1.5px;
+        fill: red;
       }
     </style>
     <script type="text/javascript"
@@ -29,22 +30,18 @@
   center: new google.maps.LatLng(37.754307, -122.449616),
   mapTypeId: google.maps.MapTypeId.TERRAIN
 });
-      d3.json("http://localhost:8000/test.json",function(data){
+      d3.json("http://localhost:8000/holder.json",function(data){
         var overlay = new google.maps.OverlayView();
         overlay.onAdd = function(){
           var layer = d3.select(this.getPanes().overlayLayer).append("div").attr("class", "stations");
           overlay.draw = function(){
             var projection = this.getProjection();
             var padding = 10;
-            var marker = layer.selectAll("svg").data(d3.entries(data)).each(transform).enter().append("svg:svg").each(transform).attr("class","marker").append("svg:circle").attr("cx",padding).attr("cy",padding).attr("r",function(d){
-              return d.value[2]
-            }).attr("fill",function(d){
-              return d.value[3]
-            });
+            var marker = layer.selectAll("svg").data(d3.entries(data)).each(transform).enter().append("svg:svg").each(transform).attr("class","marker").append("svg:circle").attr("cx",padding).attr("cy",padding).attr("r", 5);
             
 
             function transform(d){
-              d = new google.maps.LatLng(d.value[1],d.value[0]);
+              d = new google.maps.LatLng(d.value["Y"],d.value["X"]);
               d = projection.fromLatLngToDivPixel(d);
               return d3.select(this).style("left",(d.x-padding) + "px").style("top",(d.y-padding)+"px");
             }
