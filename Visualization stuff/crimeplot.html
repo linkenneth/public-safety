@@ -30,7 +30,7 @@
   center: new google.maps.LatLng(37.754307, -122.449616),
   mapTypeId: google.maps.MapTypeId.TERRAIN
 });
-      d3.json("http://localhost:8000/holder.json",function(data){
+      d3.json("http://localhost:8000/crimeplotdata200entries.json",function(data){
         var overlay = new google.maps.OverlayView();
         overlay.onAdd = function(){
           var layer = d3.select(this.getPanes().overlayLayer).append("div").attr("class", "stations");

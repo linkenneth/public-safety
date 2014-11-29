@@ -13,7 +13,7 @@
   <div id="map-canvas"></div>
   <script>
 var request = new XMLHttpRequest();
-request.open("GET", "http://localhost:8000/holder4.json", false);
+request.open("GET", "http://localhost:8000/crimedensity500.json", false);
 request.send(null)
 var my_JSON_object = JSON.parse(request.responseText);
   // don't forget to add gmaps-heatmap.js
