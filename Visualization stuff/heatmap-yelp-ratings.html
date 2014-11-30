@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCS7zRUMVWzdy-IsxMsyCw48Vv04xh79v0">
+    </script>
+    <script src="heatmap.js-develop/build/heatmap.js"></script>
+    <script src="heatmap.js-develop/plugins/gmaps-heatmap.js"></script>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+  </head>
+  <body>
+  <div id="map-canvas"></div>
+  <script>
+var request = new XMLHttpRequest();
+request.open("GET", "http://localhost:8000/test.json", false);
+request.send(null)
+var my_JSON_object = JSON.parse(request.responseText);
+  // don't forget to add gmaps-heatmap.js
+var myLatlng = new google.maps.LatLng(37.754307, -122.449616);
+// map options,
+var myOptions = {
+  zoom: 12,
+  center: myLatlng
+};
+// standard map
+map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+// heatmap layer
+heatmap = new HeatmapOverlay(map, 
+  {
+    "radius": .001,
+    "maxOpacity": .7, 
+    
+    "scaleRadius": true, 
+    
+    "useLocalExtrema": true,
+    
+    latField: 'long',
+    
+    lngField: 'lat',
+
+    valueField: 'count'
+  }
+);
+
+var testData = {
+  max: 8,
+  data: my_JSON_object["money"]
+
+};
+
+heatmap.setData(testData);
+
+  </script>
+  </body>
+</html>
