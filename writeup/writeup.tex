@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 \title{Yelp and Crime Data}  % TODO
 \author{Kenneth Lin, Tom McCormick, Sid Naik}
@@ -20,6 +21,9 @@ if we could discover any common patterns of restaurants close to crimes.
 % TODO conclusions
 
 \section{City of San Francisco Public Safety Data Set}
+
+-- introduction of data set
+-- collection conditions
 
 \begin{center}
   \includegraphics[scale=0.5]{sf_city_sample_1.png} \\
@@ -41,5 +45,40 @@ things to note:
 A more detailed analysis is in the attached \texttt{analysis.ipynb}.
 
 \section{Yelp Data Set}
+
+Yelp.com is a platform which publishes crowd-sourced reviews about local
+businesses. On Yelp, customers who have used the services of local
+businesses may write reviews of these businesses and provide ratings of
+their satisfaction. Reviewers may select from between 1 to 5 stars for each
+review they make, and a business's average rating is the average of the
+ratings of each of the reviews it has received. Yelp supplies a platform
+for all kinds of local businesses ranging from restaurants to barbers to
+museums; however, for the purpose of our research, we will look primarily
+at restaurants as they are a very large majority of the reviews on Yelp.
+
+There are two primary ways to access the data on Yelp. First, we can
+utilize the search / business API
+(\url{http://www.yelp.com/developers/documentation}). The search / business
+API provides a way to search for local businesses matching a particular key
+term (``restaurants'', for example) near a geographical location, and get
+all the rating / review information about that restaurant. The API further
+allows us to narrow the search to only the geographically closest
+restaurants (not ranked by rating). This gives us a way to link the
+geographical location of crime incidents to the types of restaurants near
+that incident.
+
+The other way of accessing Yelp data is through the academic dataset
+(\url{https://www.yelp.com/academic_dataset}).
+
+-- introduction of Yelp
+-- two APIs
+-- basic analysis
+
+\section{Putting it together}
+
+-- distribution
+-- ratings
+
+-- CONCLUSIONS??!?
 
 \end{document}
