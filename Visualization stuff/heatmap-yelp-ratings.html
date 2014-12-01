@@ -13,7 +13,7 @@
   <div id="map-canvas"></div>
   <script>
 var request = new XMLHttpRequest();
-request.open("GET", "http://localhost:8000/test.json", false);
+request.open("GET", "http://localhost:8000/500yelpentries.json", false);
 request.send(null)
 var my_JSON_object = JSON.parse(request.responseText);
   // don't forget to add gmaps-heatmap.js
@@ -28,8 +28,9 @@ map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 // heatmap layer
 heatmap = new HeatmapOverlay(map, 
   {
-    "radius": .001,
-    "maxOpacity": .7, 
+
+    "radius": .0025,
+    "maxOpacity": .58, 
     
     "scaleRadius": true, 
     
@@ -40,7 +41,7 @@ heatmap = new HeatmapOverlay(map,
     lngField: 'lat',
 
     valueField: 'count'
-  }
+    }
 );
 
 var testData = {
