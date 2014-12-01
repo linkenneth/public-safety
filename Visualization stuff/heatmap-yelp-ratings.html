@@ -13,7 +13,7 @@
   <div id="map-canvas"></div>
   <script>
 var request = new XMLHttpRequest();
-request.open("GET", "http://localhost:8000/500yelpentries.json", false);
+request.open("GET", "http://localhost:8000/1000yelpentries2.json", false);
 request.send(null)
 var my_JSON_object = JSON.parse(request.responseText);
   // don't forget to add gmaps-heatmap.js
@@ -30,12 +30,17 @@ heatmap = new HeatmapOverlay(map,
   {
 
     "radius": .0025,
-    "maxOpacity": .58, 
+    "maxOpacity": .6,
+     
     
     "scaleRadius": true, 
     
-    "useLocalExtrema": true,
-    
+    "useLocalExtrema": false,
+
+    "gradient": { 0.55: "rgb(0,0,255)", 0.88: "rgb(0,255,0)", 0.96: "yellow", 1.0: "rgb(255,0,0)"},
+
+    "blur": 0.7,
+
     latField: 'long',
     
     lngField: 'lat',
