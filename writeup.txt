@@ -8,3 +8,33 @@ We are planning to look at the location (longitude and latitude) of crimes we ge
 4. Consider the fact of non reported crimes and how that may affect our results.
 
 We found that several incidents in the crime data could have the same incident number which we at first assumed to be unique.  We just skipped over them because from the cases we physically looked at in the data, all the crimes were very related and had the same location. (Ex. multiple drug and narcatics charges) 
+
+NOTES:
+194080 restaurants closest to these crimes
+658 unique restaurants
+
+two-tailed t-test:
+In [53]: ttest_ind(a['stars'], u['rating'])
+Out[53]: (array(-12.441211677092285), 2.3897912030561156e-35)
+In [75]: ttest_ind(a[a['city'] == 'Oakland']['stars'], u['rating'])
+Out[75]: (array(-3.548231736520506), 0.00041541300578619027)
+In [76]: ttest_ind(a[a['city'] == 'Stanford']['stars'], u['rating'])
+Out[76]: (array(-8.310105051794777), 4.3356119978478476e-16)
+In [82]: ttest_ind(a[a['city'] == 'Berkeley']['stars'], u['rating'])
+Out[82]: (array(-12.389588301915623), 3.4305763895512908e-33)
+In [83]: ttest_ind(a[a['city'] == 'Menlo Park']['stars'], u['rating'])
+Out[83]: (array(0.8420887796725499), 0.40004099575687158)
+
+(filtering out for only "Restaurants" and "Food")
+In [110]: ttest_ind(r['stars'], u['rating'])
+Out[110]: (array(-20.290855255003773), 7.1030552335145506e-89)
+In [111]: ttest_ind(r[r['city'] == 'Menlo Park']['stars'], u['rating'])
+Out[111]: (array(-2.1427574936192477), 0.032498211246766946)
+In [112]: ttest_ind(r[r['city'] == 'Oakland']['stars'], u['rating'])
+Out[112]: (array(-3.548231736520506), 0.00041541300578619027)
+In [113]: ttest_ind(r[r['city'] == 'Berkeley']['stars'], u['rating'])
+Out[113]: (array(-20.490795085753653), 9.3407814618433765e-77)
+In [114]: ttest_ind(r[r['city'] == 'Stanford']['stars'], u['rating'])
+Out[114]: (array(-14.367212025236705), 3.2960212291736849e-41)
+In [115]: ttest_ind(r[r['city'] == 'Palo Alto']['stars'], u['rating'])
+Out[115]: (array(-11.711257398821267), 3.8421335372388085e-29)
