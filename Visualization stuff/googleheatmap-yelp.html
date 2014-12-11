@@ -5,6 +5,9 @@
     </script>
     <script src="heatmap.js-develop/build/heatmap.js"></script>
     <script src="heatmap.js-develop/plugins/gmaps-heatmap.js"></script>
+    <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false">
+    </script>
     <style type="text/css">
       html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
     </style>
@@ -23,39 +26,31 @@ var myOptions = {
   zoom: 12,
   center: myLatlng
 };
+var data = [];
+for (var i = 0; i < my_JSON_object["money"].length; i++){
+  var obj = my_JSON_object["money"][i];
+  var holder = new google.maps.LatLng(obj["long"],obj["lat"]);
+  var str = obj["count"];
+  var moolah = {
+    location: holder,
+    weight: str
+  };
+  data.push(moolah);
+  }
+
 // standard map
 map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 // heatmap layer
-heatmap = new HeatmapOverlay(map, 
-  {
 
-    "radius": .0025,
-    "maxOpacity": .6,
-     
-    
-    "scaleRadius": true, 
-    
-    "useLocalExtrema": false,
+var heatmap = new google.maps.visualization.HeatmapLayer({
+      data: data,
+      dissipating: false,
+      map: map,
+      radius: .005
+    });
 
-    "gradient": { 0.55: "rgb(0,0,255)", 0.88: "rgb(0,255,0)", 0.96: "yellow", 1.0: "rgb(255,0,0)"},
 
-    "blur": 0.7,
-
-    latField: 'long',
-    
-    lngField: 'lat',
-
-    valueField: 'count'
-    }
-);
-
-var testData = {
-  max: 8,
-  data: my_JSON_object["money"]
-
-};
-
-heatmap.setData(testData);
+heatmap.setMap(map);
 
   </script>
   </body>
