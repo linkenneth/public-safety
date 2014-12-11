@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCS7zRUMVWzdy-IsxMsyCw48Vv04xh79v0">
+    </script>
+    <script src="heatmap.js-develop/build/heatmap.js"></script>
+    <script src="heatmap.js-develop/plugins/gmaps-heatmap.js"></script>
+    <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false">
+    </script>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+  </head>
+  <body>
+  <div id="map-canvas"></div>
+  <script>
+var request = new XMLHttpRequest();
+request.open("GET", "http://localhost:8000/1000yelpentries2.json", false);
+request.send(null)
+var my_JSON_object = JSON.parse(request.responseText);
+  // don't forget to add gmaps-heatmap.js
+var myLatlng = new google.maps.LatLng(37.754307, -122.449616);
+// map options,
+var myOptions = {
+  zoom: 12,
+  center: myLatlng
+};
+var data = [];
+for (var i = 0; i < my_JSON_object["money"].length; i++){
+  var obj = my_JSON_object["money"][i];
+  var holder = new google.maps.LatLng(obj["long"],obj["lat"]);
+  var str = obj["count"];
+  var moolah = {
+    location: holder,
+    weight: str
+  };
+  data.push(moolah);
+  }
+
+// standard map
+map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+// heatmap layer
+
+var heatmap = new google.maps.visualization.HeatmapLayer({
+      data: data,
+      dissipating: false,
+      map: map,
+      radius: .005
+    });
+
+
+heatmap.setMap(map);
+
+  </script>
+  </body>
+</html>
