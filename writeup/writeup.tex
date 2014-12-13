@@ -2,10 +2,13 @@
 
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{amssymb}
 
-\title{Yelp and Crime Data}  % TODO
-\author{Kenneth Lin, Tom McCormick, Sid Naik}
+\title{Yelp and Crime}  % TODO
+\author{Kenneth Lin, Sid Naik, Tom McCormick}
 \date{\today}
+
+\renewcommand{\labelitemi}{\checkmark}
 
 \begin{document}
 \maketitle
@@ -14,22 +17,61 @@
 
 For our CS 194 final project, we decided to investigate the potential
 relationship between the City of San Francisco public safety data set and
-the data set provided by the Yelp API. At first, we explored each data set
-individually to discover general patterns in the data set. After that was
-completed, we looked at the nearest 20 restaurants near each crime to see
-if we could discover any common patterns of restaurants close to crimes.
-% TODO problem statement
+the data set provided by the Yelp API. With the recent civil unrest both
+inside and outside of the United States, and more recently, right here in
+Berkeley, we thought that it would be interesting to look into the factors
+that promote crime. One of our team members (Kenneth Lin) had also been
+robbed recently, so the problem is one that is dear to our hearts. Perhaps
+the most well-known correlation with crime rate is the income level of a
+neighborhood -- the lower the income level, the higher the crime rate
+\cite[p.93-94]{levitt-the-changing-relationship}. However, we wanted to
+show something more interesting. In particular, Yelp restaurants, in our
+experience, often reflect the wealth and well-being of its surrounding
+neighborhood -- the presence of many highly rated restaurants, we believed,
+reflect the optimism in the economy of a neighborhood, as well as the
+wealth and ``goodness'' of that neighborhood. Therefore, we had conjectured
+that crime would negatively impact restaurant ratings, or that low
+restaurant ratings would be correlated with areas of high crime. We worked
+to show this throughout our project.
+
+% At first, we explored each data set individually to discover general
+% patterns in the data set. After that, we delved into our main problem. We
+% are interested in the relationship (if any) between the quality of
+% restaurants and the frequency and severity of crime. In particular, we
+% wanted to know
+
+In particular, we wanted to know
+
+\begin{itemize}
+\item the effect of crime on restaurant ratings (or vice versa)
+\item the distribution of crime vs. the distribution of ratings
+\end{itemize}
+
+We had also wanted to predict crime density / severity using restaurant
+ratings or vice versa, but along the way we ran into issues of determining
+or implying causation in any of the methods we used. By using one to
+predict the other and trying to draw useful conclusions from this, we run
+the risk of assuming causation without definitive proof. There are many
+other problems that may arise as a result of this, which will be discussed
+in the \textbf{\nameref{sec:lessons-learned}} section.
 
 \subsection{City of San Francisco Public Safety Data Set}
 
--- introduction of data set
--- collection conditions
+The City of San Francisco public safety dataset is a record, written by the
+San Francisco Police Department, of incoming incident reports, either via
+phone call, in person, or otherwise. The incidents are reported via the
+SFPD CABLE crime incident reporting system. The incidents are reported over
+the course of more than 11 years, from 1/1/2003 to present. A sample of
+records in the dataset looks like the following:
 
 \begin{center}
   \includegraphics[scale=0.5]{sf_city_sample_1.png} \\
   \includegraphics[scale=0.5]{sf_city_sample_2.png} \\
   Figure 1: Sample of San Francisco crime data set
 \end{center}
+
+-- introduction of data set
+-- collection conditions
 
 The majority of the fields are self-explanatory. However, there are a few
 things to note:
@@ -68,7 +110,7 @@ geographical location of crime incidents to the types of restaurants near
 that incident.
 
 The other way of accessing Yelp data is through the academic data set
-(\url{https://www.yelp.com/academic_dataset}). The Ylpe academic data set
+(\url{https://www.yelp.com/academic_dataset}). The Yelp academic data set
 provides all the data and associated reviews of the 250 closest businesses
 for 30 universities, including UC Berkeley. Although not a random sample of
 all businesses on Yelp, the academic data set provides a much better
@@ -77,6 +119,12 @@ estimate of all businesses in the Yelp data set population.
 -- introduction of Yelp
 -- two APIs
 -- basic analysis
+
+\section{Methods}
+
+\section{Tools}
+
+\section{Results}
 
 \subsection{Putting it together}
 
@@ -90,5 +138,11 @@ estimate of all businesses in the Yelp data set population.
 ---- not enough data on all of san francisco to create proper viz
 
 -- condition tests in certain neighborhoods
+
+\section{Lessons Learned}
+\label{sec:lessons-learned}
+
+\bibliographystyle{IEEEtran}
+\bibliography{writeup-bibliography}
 
 \end{document}
