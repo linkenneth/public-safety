@@ -9,6 +9,8 @@ auto/
 *.synctex.gz
 *.out
 *.aux
+*.bbl
+*.blg
 
 # Yelp API keys
 yelp-python/*.key
