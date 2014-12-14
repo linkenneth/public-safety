@@ -38,7 +38,6 @@ CONSUMER_SECRET = open('consumer_secret.key').read().strip()
 TOKEN = open('token.key').read().strip()
 TOKEN_SECRET = open('token_secret.key').read().strip()
 
-
 def request(host, path, url_params=None):
     """Prepares OAuth authentication and sends the request to the API.
 
@@ -125,8 +124,7 @@ def query_api(term, location):
     for offset in xrange(0, 1000, 20):
         response = search(term, location, offset=offset)
         businesses = response.get('businesses')
-        print [business['rating'] for business in businesses]
-    return
+        print [business['id'] for business in businesses]
 
     if not businesses:
         print 'No businesses for {0} in {1} found.'.format(term, location)
