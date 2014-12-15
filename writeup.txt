@@ -38,3 +38,9 @@ Out[134]: (array(-14.367212025236705), 3.2960212291736849e-41)
 
 In [135]: ttest_ind(r[r['city'] == 'Los Angeles']['stars'], u['rating'])
 Out[135]: (array(-18.79720731689104), 2.2759892573384681e-68)
+
+CENSUS TRACT DATA LOCATION:
+https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2010-Census-Blocks-for-San-Francisco-Zipped/d7g8-55kx
+
+POPULATION DENSITY DATA LOCATION:
+https://data.sfgov.org/Health-and-Social-Services/Population-Density-San-Francisco-CA/ea9w-4zvc

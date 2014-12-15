@@ -8,6 +8,8 @@
 \author{Kenneth Lin, Sid Naik, Tom McCormick}
 \date{\today}
 
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+
 \renewcommand{\labelitemi}{\checkmark}
 
 \begin{document}
@@ -115,7 +117,11 @@ The other way of accessing Yelp data is through the academic data set
 provides all the data and associated reviews of the 250 closest businesses
 to each of 30 universities, including UC Berkeley. Although not a random
 sample of all businesses on Yelp, the academic data set provides a much
-better estimate of all businesses in the Yelp data set population.
+better estimate of all businesses in the Yelp data set population. For the
+purposes of the analysis, we will assume for now that this data set is
+a perfect sample of the entire Yelp data set, and that its average is
+indicative of the Yelp-wide average. Issues with this assumption will be
+addressed in the \textbf{\nameref{sec:lessons-learned}} section.
 
 -- basic analysis
 
@@ -171,7 +177,57 @@ that we installed on our EC2 server.
 
 \subsection{Looking for Correlations}
 
+Our primary purpose (initially) was to determine how crime affected
+restaurant ratings. Specifically, given the limitations of the data we
+could get from Yelp, we wanted to see whether Yelp restaurant ratings were
+any different when they were near crime hotspots.
+
+At this point, we could access two data sets -- the data set of
+``near-crime'' restaurants, obtained through querying for restaurants near
+crime incident locations via the Yelp API, and the Yelp academic data
+set. Given this data, we had a few options to draw a correlation:
+\begin{enumerate}
+\item We could look at the ``average rating'' of a crime -- that is, we
+  could take the average rating of the 20 closest restaurants to a crime
+  incident and call that the average rating of restaurants near that
+  crime. Then, we could compare that rating with the Yelp-wide average from
+  the academic data set.
+\item We could look at all the \textit{restaurants} near any of the crime
+  incidents in the crime data set. Then, we can put these together as a set
+  of ``near-crime'' restaurants, and look at the rating distribution of
+  these compared to the academic data set.
+\end{enumerate}
+We had originally planned to execute option 1. However, as we realized from
+exploring the crime data set, crime density is very different for different
+areas of San Francisco. If we look at the average rating of each crime, it
+is likely that the results would be very heavily weighted by the ratings of
+restaurants in high crime density areas (ie. Market Street). Although our
+very purpose was to show that high crime density areas were prone to
+different kinds of Yelp ratings, we did not want to artificially induce
+this by weighting the results by the crime density itself. Therefore, we
+chose the second option. Surprisingly, we discovered that in the 9704
+unique incidents we looked at and the 194080 restaurants near those
+incidents, there were only a total of 658 unique restaurants. This implies
+that the crimes were indeed very clustered, and that use of the ``average
+rating of a crime'' method (option 1) would have resulted in significant
+bias to restaurants near the clustered areas. This will be discussed more
+in the \textbf{\nameref{sec:lessons-learned}} section.
+
+To determine whether there were any significant differences between the two
+data sets, we used a Student's t-test as our statistical hypothesis
+test. In this case, the null hypothesis was that the two data sets, both of
+Yelp ratings in San Francisco, have identical expected values (means). The
+t-test results are more thoroughly discussed in the
+\textbf{\nameref{sec:results}} section. Through the analysis, however, we
+learned instead that restaurants near high-crime areas actually had higher
+ratings than the Yelp-wide average.
+
+However, as we learned through % TODO explain correlation != causation
+
 \subsection{Accounting for Population Density}
+
+As a result of our findings, we realized that causation != correlation.
+% TODO more
 
 -- tract difficulties, calculating tract centers
 
@@ -207,8 +263,46 @@ that we installed on our EC2 server.
 \end{itemize}
 
 \section{Results}
+\label{sec:results}
 
-\subsection{Putting it together}
+A preliminary analysis of just the public safety data set is available in
+the attached \texttt{analysis.pynb}. Below follows our results and
+conclusions from looking at Yelp restaurant rating data near crime
+hotspots.
+
+\section{Putting it together}
+
+The results of the t-test between the near-crime data set and subsets of
+the academic data set are detailed in Table 1.
+
+\begin{center}
+  \begin{tabular}{ | l | c | c | c | c | }
+    \hline
+    Data set                       & Mean  & Variance & t-statistic* & p-value*    \\
+    \hline
+    Near-crime                     & 4.072 & 0.107    &              &             \\
+    All businesses (all)           & 3.618 & 0.871    & -12.441      & 2.39\e{-35} \\
+    All businesses (Berkeley)      & 3.629 & 0.701    & -12.390      & 3.43\e{-33} \\
+    All businesses (Stanford)      & 3.696 & 0.716    & -8.310       & 4.34\e{-16} \\
+    All businesses (Los Angeles)   & 3.571 & 0.976    & -12.542      & 1.66\e{-34} \\
+    Restaurants only (all)         & 3.482 & 0.545    & -20.291      & 7.10\e{-89} \\
+    Restaurants only (Berkeley)    & 3.413 & 0.382    & -20.490      & 9.34\e{-77} \\
+    Restaurants only (Stanford)    & 3.307 & 0.270    & -14.367      & 3.30\e{-41} \\
+    Restaurants only (Los Angeles) & 3.431 & 0.598    & -18.797      & 2.28\e{-68} \\
+    \hline
+  \end{tabular}
+
+  Table 1: t-test results against ``near-crime'' data set
+\end{center}
+* against the ``near-crime'' data set
+
+The ``all businesses'' data sets refer to all the businesses provided by
+the academic data set, whereas the ``restaurants only'' data sets filtered
+out only the businesses in the academic data set that had ``Food'' or
+``Restaurants'' as one of the items in its category field.
+
+-- whisker plots
+-- scatter plots
 
 -- distribution
 -- ratings
@@ -227,9 +321,15 @@ that we installed on our EC2 server.
 -- Yelp API shit; no one uses
 -- data cleaning hard
 -- causation and correlation
--- problem statement
+-- tract difficulties
+-- clear problem statement
+----> not our fault, more because we didn't have experience with data
+science projects and no proper guidance
 -- problems with the data (not sure where it's from)
 -- don't draw conclusions before the results are out
+-- note about Yelp data not having ``price'' characteristic
+-- academic data set biased
+-- keyword match problems
 
 \bibliographystyle{IEEEtran}
 \bibliography{writeup-bibliography}
