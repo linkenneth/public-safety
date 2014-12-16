@@ -318,7 +318,7 @@ the attached \texttt{analysis.pynb}. Below follows our results and
 conclusions from looking at Yelp restaurant rating data near crime
 hotspots.
 
-\section{Visualizations}
+\subsection{Visualizations}
 
 \begin{center}
   \includegraphics[keepaspectratio=true, width=350px]{crime_density_heatmap.png}
@@ -334,7 +334,7 @@ hotspots.
   set. Black = 5.0; red = 4.5; yellow = 4.0; green = 3.5; blue = 3.0 \\[20pt]
 \end{center}
 
-\section{Putting it together}
+\subsection{Putting it together}
 
 The results of the t-test between the near-crime data set and subsets of
 the academic data set are detailed in Table 1.
@@ -342,17 +342,17 @@ the academic data set are detailed in Table 1.
 \begin{center}
   \begin{tabular}{ | l | c | c | c | c | }
     \hline
-    Data set                       & Mean  & Variance & t-statistic* & p-value*    \\
+    Data set                       & Mean  & Std   & t-statistic* & p-value*    \\
     \hline
-    Near-crime                     & 4.072 & 0.107    &              &             \\
-    All businesses (all)           & 3.618 & 0.871    & -12.441      & 2.39\e{-35} \\
-    All businesses (Berkeley)      & 3.629 & 0.701    & -12.390      & 3.43\e{-33} \\
-    All businesses (Stanford)      & 3.696 & 0.716    & -8.310       & 4.34\e{-16} \\
-    All businesses (Los Angeles)   & 3.571 & 0.976    & -12.542      & 1.66\e{-34} \\
-    Restaurants only (all)         & 3.482 & 0.545    & -20.291      & 7.10\e{-89} \\
-    Restaurants only (Berkeley)    & 3.413 & 0.382    & -20.490      & 9.34\e{-77} \\
-    Restaurants only (Stanford)    & 3.307 & 0.270    & -14.367      & 3.30\e{-41} \\
-    Restaurants only (Los Angeles) & 3.431 & 0.598    & -18.797      & 2.28\e{-68} \\
+    Near-crime                     & 4.072 & 0.327 &              &             \\
+    All businesses (all)           & 3.618 & 0.933 & -12.441      & 2.39\e{-35} \\
+    All businesses (Berkeley)      & 3.629 & 0.837 & -12.390      & 3.43\e{-33} \\
+    All businesses (Stanford)      & 3.696 & 0.846 & -8.310       & 4.34\e{-16} \\
+    All businesses (Los Angeles)   & 3.571 & 0.988 & -12.542      & 1.66\e{-34} \\
+    Restaurants only (all)         & 3.482 & 0.739 & -20.291      & 7.10\e{-89} \\
+    Restaurants only (Berkeley)    & 3.413 & 0.618 & -20.490      & 9.34\e{-77} \\
+    Restaurants only (Stanford)    & 3.307 & 0.520 & -14.367      & 3.30\e{-41} \\
+    Restaurants only (Los Angeles) & 3.431 & 0.773 & -18.797      & 2.28\e{-68} \\
     \hline
   \end{tabular}
 
@@ -394,9 +394,13 @@ the crime rate, but it's also possible that both are correlated with a
 third confounding factor. In particular, from the visualizations we created
 earlier, it's very likely that population density would be a factor. Areas
 near Market Street are known to be the most popular areas in San Francisco,
-for work, shopping, and many other things. As we were not familiar with
-these statistical notions when we formulated our problem statement, we had
-not thought of problems like these when we started.
+for work, shopping, and many other things. A high population density would
+spark growth and increase competition, so any restaurants that are able to
+stay in the area must be high quality. A high population density would also
+attract crime, as there are more targets, and the chaos of the busy streets
+may make it easier to get away. As we were not familiar with these
+statistical notions when we formulated our problem statement, we had not
+thought of problems like these when we started.
 
 Due to the limitations of the Yelp API, we could not get Yelp data with an
 even distribution across all of San Francisco. Given what we had, we wanted
@@ -417,7 +421,39 @@ reason behind why our hypothesis was wrong.
 Using the methods described in the \textbf{\nameref{sec:methods}} section,
 we decided to also compare the population density of those areas.
 
-% TODO population density comparison
+\subsection{Population Density}
+
+Another simpler t-test was performed in order to see how high-crime areas
+were correlated with population density. From the population density data,
+we found that the total population density of the city of San Francisco was
+17143.59 people per square mile. We conducted a one-sample t-test to
+determine whether either of the following two data sets were significantly
+different from the city of San Francisco mean population density. The first
+data set is that of the population density of the near-crime restaurant
+data set. That is, it is the population densities of tracts containing the
+Yelp restaurants which were found to be close to crime incidents. The next
+is the data set of the population density of crime itself. In other words,
+it is the population densities of the tracts of 9704 distinct crimes. We
+will call the first one the ``restaurants'' data set and the second one the
+``crimes'' data set.
+
+\begin{center}
+  \begin{tabular}{ | l | c | c | c | c | }
+    \hline
+    Data set    & Mean     & Std      & t-statistic* & p-value*      \\
+    \hline
+    Restaurants & 25437.36 & 15694.58 & 13.56        & 4.34\e{-37}   \\
+    Crimes      & 34488.61 & 30239.04 & 62.83        & $\approx$ 0.0 \\
+    \hline
+  \end{tabular}
+
+  Table 2: t-test results against known population density mean
+\end{center}
+* against known population density mean of 17143.59 people per square mile
+
+The results indicate that the restaurants and crimes were indeed correlated
+with a significantly higher population density. Again, as we lack the data
+and tools to % TODO
 
 -- distribution
 -- ratings
@@ -436,6 +472,8 @@ we decided to also compare the population density of those areas.
 Our project was nowhere near perfect, but through our project, we learned
 many, many valuable lessons that will no doubt benefit any future data
 science projects we perform.
+
+-- rate limiting
 
 \subsection{The Problem Statement}
 
