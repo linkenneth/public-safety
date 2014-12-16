@@ -207,7 +207,11 @@ Google map based on their rating with red being every data point in the
 95th percentile, yellow 75th percentile, green 50th percentile, and
 elsewhere blue.
 
-Lastly to create the last plot of the near crime data, the method was very similar to the plot of all the yelp ratings, except that the amount of data was less and the gradient was slightly different being: ratings > 4.5 : black, ratings = 4.5: red, ratings >=4: gold, ratings >=3.5: green, other: blue.
+Lastly to create the last plot of the near crime data, the method was very
+similar to the plot of all the Yelp ratings, except that the amount of data
+was less and the gradient was slightly different being: ratings > 4.5 :
+black, ratings = 4.5: red, ratings >=4: gold, ratings >=3.5: green, other:
+blue.
 
 \subsection{Looking for Correlations}
 
@@ -280,9 +284,17 @@ associated population density for a restaurant or crime. The result allowed
 us to look for a possible correlation between crime density and population
 density.
 
-As a result of our findings, we realized that causation != correlation.
-% TODO more
-One difficulty we had with integrating this data was that the data was given to us divided up into tracts which is a standardized area of land used by the government to collect census data. However, the crime data and therefore the yelp data as it was based off of the crime data, were based on specific latitude and longitude areas. A better way to have done it would have been to look at crimes density by tract as well as average yelp data by tract. This would have possibly allowed us to draw correlations with more conviction as well as allow us to implement other statistical tools such as a regression. Alas, we happened to collect the crime and yelp data before the population density, and it would have been too time consuming to recollect all the crime density and yelp ratings.
+One difficulty we had with integrating this data was that the data was
+given to us divided up into tracts, which are standardized regions of land
+used by the government to collect census data. However, the crime data, and
+therefore the Yelp data, were based on specific latitude and longitude
+coordinates. A better way to have done it would have been to look at crimes
+density by tract as well as average yelp data by tract. This would have
+possibly allowed us to draw correlations with more conviction as well as
+allow us to implement other statistical tools such as a regression. Alas,
+we happened to collect the crime and Yelp data before the population
+density, and it would have been too time consuming to recollect all the
+crime density and Yelp ratings.
 
 \section{Tools}
 
@@ -453,19 +465,13 @@ will call the first one the ``restaurants'' data set and the second one the
 * against known population density mean of 17143.59 people per square mile
 
 The results indicate that the restaurants and crimes were indeed correlated
-with a significantly higher population density. Again, as we lack the data
-and tools to % TODO
-
--- distribution
--- ratings
-
--- CONCLUSIONS??!?
-
--- map visualization problems
----- yelp data biased to near crime
----- not enough data on all of san francisco to create proper viz
-
--- condition tests in certain neighborhoods
+with a significantly higher population density. This confirms our suspicion
+that population density, or another similar confounding factor, played a
+role in the correlation between crime density and Yelp ratings. However,
+again, as we lack the data and tools to prove this definitively, we can
+only say that further investigation into the relationships between crime
+density, Yelp rating distribution, and population density would be a
+profitable cause.
 
 \section{Lessons Learned}
 \label{sec:lessons-learned}
@@ -473,8 +479,6 @@ and tools to % TODO
 Our project was nowhere near perfect, but through our project, we learned
 many, many valuable lessons that will no doubt benefit any future data
 science projects we perform.
-
--- rate limiting
 
 \subsection{The Problem Statement}
 
@@ -540,22 +544,24 @@ two major problems:
 Furthermore, we also had technical issues with the Yelp API. We had found
 many bugs in the Yelp API and sample code, both of which were no longer
 maintained. Aside from the authentication bug mentioned, the Yelp API also
-had issues handling Unicode. Data fetching was tedious and marginally
-better than scraping at best. Furthermore, the API lacked some of the
-properties displayed on the website such as price range (denoted by a
-number of dollar signs from 1 to 4). Characteristics like this may have
-been better correlated with crime density, or would at least have given us
-a clearer picture of the reason behind why our hypothesis was
-wrong. Keyword search with location was also a strange idea, because due to
-the way search is implemented there are necessarily restaurants that may
-not be included in a search result (false negatives in the
-search). Usually, for the purposes of a human user, this would not be a
-problem, but if the search filters out actual restaurants because it
-doesn't match the keyword as well, then this process introduces bias into
-our data. Finally, in hindsight, Yelp rating data was too limited to be
-informative. The API only provides rating data accurate to 0.5 increments,
-so there are only a total of 10 different ratings a restaurant could
-have. We had asked Yelp developers through email to provide us with a
+had issues handling Unicode. The rate limiting and the slow response rate
+of the Yelp API also meant that we couldn't query every single location in
+San Francisco to obtain data for every single restaurant in Yelp's
+database. Data fetching was tedious and marginally better than scraping at
+best. Furthermore, the API lacked some of the properties displayed on the
+website such as price range (denoted by a number of dollar signs from 1 to
+4). Characteristics like this may have been better correlated with crime
+density, or would at least have given us a clearer picture of the reason
+behind why our hypothesis was wrong. Keyword search with location was also
+a strange idea, because due to the way search is implemented there are
+necessarily restaurants that may not be included in a search result (false
+negatives in the search). Usually, for the purposes of a human user, this
+would not be a problem, but if the search filters out actual restaurants
+because it doesn't match the keyword as well, then this process introduces
+bias into our data. Finally, in hindsight, Yelp rating data was too limited
+to be informative. The API only provides rating data accurate to 0.5
+increments, so there are only a total of 10 different ratings a restaurant
+could have. We had asked Yelp developers through email to provide us with a
 separate data set with more resolution in ratings, but they weren't able to
 provide us with anything.
 
@@ -570,26 +576,6 @@ we do data science, and the implications of finding a correlation. We also
 didn't realize that confounding factors were something that almost
 definitely had to account for, as our original plan was just to predict
 crime density using restaurant ratings by utilizing machine learning.
-
-% -- causation and correlation
-% -- tract difficulties
-% -- clear problem statement
-% ----> not our fault, more because we didn't have experience with data
-% science projects and no proper guidance
-% -- problems with the data (not sure where it's from)
-% -- don't draw conclusions before the results are out
-% -- note about Yelp data not having ``price'' characteristic
-% -- academic data set biased
-% -- keyword match problems
-
-% -- IMPORTANT: COULD NOT GET CITY WIDE DATASET EASILY, so resort to strange
-% / weird separate tests
-% ----> no such thing as ``city-wide average''
-% ----> can't predict for rest of SF yelp data set because can't access
-% ----> should have gotten Yelp rating per tract / area so can compare with
-% crime density and population density per tract
-
-% -- must stress, given the limitations we did pretty well
 
 -- unfortunately couldn't show causation but good idea of why
 
