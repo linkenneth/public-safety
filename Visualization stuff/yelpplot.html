@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+      .stations, .stations svg{
+        position: absolute;
+      }
+      .stations svg{
+        width: 60px;
+        height: 20px;
+        padding-right: 100px;
+      }
+      .stations circle{
+        stroke: black;
+        stroke-width: .05px;
+      }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCS7zRUMVWzdy-IsxMsyCw48Vv04xh79v0">
+    </script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+    <script type="text/javascript">
+      var map = new google.maps.Map(d3.select("#map-canvas").node(),{
+  zoom: 12,
+  center: new google.maps.LatLng(37.754307, -122.449616),
+  mapTypeId: google.maps.MapTypeId.TERRAIN
+});
+      d3.json("http://localhost:8000/testies.json",function(data){
+        var overlay = new google.maps.OverlayView();
+        overlay.onAdd = function(){
+          var layer = d3.select(this.getPanes().overlayLayer).append("div").attr("class", "stations");
+          overlay.draw = function(){
+            var projection = this.getProjection();
+            var padding = 10;
+            var marker = layer.selectAll("svg").data(d3.entries(data)).each(transform).enter().append("svg:svg").each(transform).attr("class","marker").append("svg:circle").attr("cx",padding).attr("cy",padding).attr("r", 1).attr("fill", function(d){
+              if (d.value["Rating"] >= 4.25){
+                return "red";
+              } else if (d.value["Rating"] >= 4.225){
+                return "yellow";
+              } else if (d.value["Rating"] >= 4.2){
+                return "green";
+              } else{
+                return "blue";
+              }
+            });
+            
+
+            function transform(d){
+              d = new google.maps.LatLng(d.value["Y"],d.value["X"]);
+              d = projection.fromLatLngToDivPixel(d);
+              return d3.select(this).style("left",(d.x-padding) + "px").style("top",(d.y-padding)+"px");
+            }
+          };
+        };
+        overlay.setMap(map);
+      })
+      
+    </script>
+  </body>
+</html>
