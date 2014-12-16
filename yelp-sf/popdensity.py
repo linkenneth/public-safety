@@ -43,10 +43,10 @@ print len(runner)
 for x in range(0,len(runner)):
     whoadie.append(findTract(runner.iloc[x],turnup))
 
-whos = {}
-for i, row in loc.iterrows():
-    print i, row['id']
-    whos[i] = findTract(row, turnup)
+# whos = {}
+# for i, row in loc.iterrows():
+#     print i, row['id']
+#     whos[i] = findTract(row, turnup)
     
 runner["Tract"] = whoadie
 migosatl = pd.read_csv("population.csv")
