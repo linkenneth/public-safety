@@ -43,7 +43,6 @@ to show this throughout our project.
 % wanted to know
 
 In particular, we wanted to know
-
 \begin{itemize}
 \item the effect of crime on restaurant ratings (or vice versa)
 \item the distribution of crime vs. the distribution of ratings
@@ -123,6 +122,7 @@ indicative of the Yelp-wide average. Issues with this assumption will be
 addressed in the \textbf{\nameref{sec:lessons-learned}} section.
 
 \section{Methods}
+\label{sec:methods}
 
 \subsection{Data Fetching}
 
@@ -145,32 +145,34 @@ server-side authentication expected the OAuth-signed URLs to use ``\%20''
 as the proper encoding for space. In this context (the query arguments in a
 URL), both should be valid, but Yelp's authenticator only expected the
 latter. After figuring this out, we let the Yelp engineers know of the bug,
-and were able to begin building a temporary work-around to fetch our data.
+and were able to build a temporary work-around to fetch our data.
 
 We also encountered other problems in data fetching. In addition to the
 bugs in the API, there were rate limiting and quantity limiting issues as
 well. In particular, we could only access 20 results at a time, and a
 maximum of 40 total results for searches that sorted the results by only
-distance or rating. With searches not purely by distance or rating, Yelp
-enforced its own ranking to its results. Results further down the results
-page became so varied that they no longer matched the keyword (for example,
-Yep may provide a gym even though ``food'' was specified simply because the
-gym was much closer than any other ``food'' locations). All of the above
+distance or rating. With searches not by distance or rating, Yelp enforced
+its own ranking to its results. Results further down the results page
+became so varied that they no longer matched the keyword (for example, Yep
+may provide a gym even though ``food'' was specified simply because the gym
+was much closer than any other ``food'' locations). All of the above
 limited the ways in which we could obtain and analyze Yelp data.
 
 For us, the ideal way to get Yelp data would be to have a data set
 containing data on every single restaurant in San Francisco. This would
 have been the most ideal solution as
 \begin{enumerate}
-\item we could then \textit{compare} the properties of restaurants near
+\item we could then compare the \textit{properties of restaurants} near
   crimes to the general population of restaurants in San Francisco
   properly. The way we do this instead is to use the academic data set, but
   that includes data from other cities
 \item the data we had would be the \textit{entire population} of restaurants in San
   Francisco (that Yelp has in their database)
-\item we could then easily compare any other location-based data (like
+\item we could then compare any other \textit{location-based data} (like
   population density) and determine any confounding factors in our
-  statistical model. This wasn't discovered until after our t-test results.
+  statistical model. This wasn't discovered until after our t-test
+  results. The way we had to access the data instead introduced bias
+  towards high-crime areas into the data set.
 \end{enumerate}
 
 Further, we weren't able to get as much data as we needed (because of
@@ -188,8 +190,22 @@ that we installed on our EC2 server.
 
 \subsection{Visualization}
 
-% TODO
-% TODO do yelp rating map
+After fetching the data, % TODO
+
+To create the heatmap for crime density, we took the map and created a 100
+x 100 grid where we assigned a value to each spot on the grid based on the
+amount of crimes in the area. We used the numpy module gaussian\_kde to help
+us accomplish this. Then we exported this data structure as a csv with
+fields longitude, latitude, and density. Then using heatmap.js, a
+javascript library, we were able to create a heatmap layer over the Google
+map, which we got using the Google maps API, of the region.
+
+To create the plot of the yelp data, we had to first get our data in a csv
+file with the fields longitude, latitude, and density. Once these fields
+were found, we used the d3 library in javascript to plot circles on a
+Google map based on their rating with red being every data point in the
+95th percentile, yellow 75th percentile, green 50th percentile, and
+elsewhere blue.
 
 \subsection{Looking for Correlations}
 
@@ -226,8 +242,10 @@ unique incidents we looked at and the 194080 restaurants near those
 incidents, there were only a total of 658 unique restaurants. This implies
 that the crimes were indeed very clustered, and that use of the ``average
 rating of a crime'' method (option 1) would have resulted in significant
-bias to restaurants near the clustered areas. This will be discussed more
-in the \textbf{\nameref{sec:lessons-learned}} section.
+bias to restaurants near the clustered areas. A further examination of the
+visualizations indicate that crime was indeed highly clustered near Market
+Street. This will be discussed more in the \textbf{\nameref{sec:results}}
+section.
 
 To determine whether there were any significant differences between the two
 data sets, we used a Student's t-test as our statistical hypothesis
@@ -236,20 +254,34 @@ Yelp ratings in San Francisco, have identical expected values (means). The
 t-test results are more thoroughly discussed in the
 \textbf{\nameref{sec:results}} section. Through the analysis, however, we
 learned instead that restaurants near high-crime areas actually had higher
-ratings than the Yelp-wide average.
-
-However, as we learned through % TODO explain correlation != causation
+ratings than the Yelp-wide average. This indicates that our hypothesis was
+wrong. However, we also realized around this time that any correlation,
+positive or negative, does not imply causation.
 
 \subsection{Accounting for Population Density}
+
+In an effort to learn why our hypothesis was wrong, we began considering
+confounding factors. The two heatmaps we created seem to indicate that
+population density was key.
+
+% TODO snapshot of the data?
+
+To gather the data on population density, we found a database file (.dbf)
+from \url{data.sfgov.org} that contained a table that mapped tract (a unit
+of area used by the census) to population density. We were also able to
+find another data set that contained the tract centers (longitude and
+latitude) for each tract. By associating each longitude and latitude pair
+with the closest tract center (using great-circle distance for the Earth),
+and then joining the population-density-by-tract-table on tract, we could
+estimate which tract each restaurant or crime was in, and find an
+associated population density for a restaurant or crime. The result allowed
+us to look for a possible correlation between crime density and population
+density.
 
 As a result of our findings, we realized that causation != correlation.
 % TODO more
 
 -- tract difficulties, calculating tract centers
-
-\subsection{Predicting Crimes}
-
-% TODO more subsections
 
 \section{Tools}
 
@@ -285,6 +317,22 @@ A preliminary analysis of just the public safety data set is available in
 the attached \texttt{analysis.pynb}. Below follows our results and
 conclusions from looking at Yelp restaurant rating data near crime
 hotspots.
+
+\section{Visualizations}
+
+\begin{center}
+  \includegraphics[keepaspectratio=true, width=350px]{crime_density_heatmap.png}
+  Figure 2: Heatmap of crime density \\[20pt]
+
+  \includegraphics[keepaspectratio=true, width=350px]{all_yelp_ratings_plotted.jpg}
+  Figure 3: Plot of ``average Yelp rating of crimes''. Each point
+  corresponds to a crime, and the color corresponds to the average rating
+  of the closest 20 restaurants to that crime. \\[20pt]
+
+  \includegraphics[keepaspectratio=true, width=350px]{unique_yelp_rating_plot.jpg}
+  Figure 5: Plot of Yelp ratings for restaurants in the near-crime data
+  set. Black = 5.0; red = 4.5; yellow = 4.0; green = 3.5; blue = 3.0 \\[20pt]
+\end{center}
 
 \section{Putting it together}
 
@@ -323,14 +371,14 @@ average Yelp rating as the other data sets. The following two plots provide
 a better picture of the actual distribution of each data set.
 
 \begin{center}
-  \includegraphics[scale=0.5]{boxplot.png} \\
+  \includegraphics[keepaspectratio=true, width=320px]{boxplot.png}
   Figure 2: Box-and-whiskers plot of distribution of the ratings of
-  different data sets
+  different data sets \\[20pt]
 
-  \includegraphics[scale=0.5]{scatter_plot.png} \\
+  \includegraphics[keepaspectratio=true, width=320px]{scatter_plot.png}
   Figure 3: Scatter plot of distribution of the ratings of different data
   sets. Points plotted with certain randomness to show distribution of
-  points.
+  points. \\[20pt]
 \end{center}
 
 However, the data indicates that our initial hypothesis was also wrong --
@@ -366,9 +414,10 @@ Francisco. Although the results of this test would not be directly related
 to the test performed above, it would provide exploratory insight into the
 reason behind why our hypothesis was wrong.
 
-% TODO why do we go to population density
+Using the methods described in the \textbf{\nameref{sec:methods}} section,
+we decided to also compare the population density of those areas.
 
-% TODO where to put correlation vs causation
+% TODO population density comparison
 
 -- distribution
 -- ratings
@@ -384,27 +433,126 @@ reason behind why our hypothesis was wrong.
 \section{Lessons Learned}
 \label{sec:lessons-learned}
 
--- Yelp API shit; no one uses
--- data cleaning hard
--- causation and correlation
--- tract difficulties
--- clear problem statement
-----> not our fault, more because we didn't have experience with data
-science projects and no proper guidance
--- problems with the data (not sure where it's from)
--- don't draw conclusions before the results are out
--- note about Yelp data not having ``price'' characteristic
--- academic data set biased
--- keyword match problems
+Our project was nowhere near perfect, but through our project, we learned
+many, many valuable lessons that will no doubt benefit any future data
+science projects we perform.
 
--- IMPORTANT: COULD NOT GET CITY WIDE DATASET EASILY, so resort to strange
-/ weird separate tests
-----> no such thing as ``city-wide average''
-----> can't predict for rest of SF yelp data set because can't access
-----> should have gotten Yelp rating per tract / area so can compare with
-crime density and population density per tract
+\subsection{The Problem Statement}
 
--- must stress, given the limitations we did pretty well
+Perhaps the most important thing that we learned is to formulate a clear
+problem statement from the very beginning. When we began the project, we
+were looking to find interesting correlations between Yelp restaurant
+ratings and crime occurrences. However, as we didn't have experience with
+data science projects, we weren't used to formulating rigorous statistical
+hypotheses. As a result, we forgot about the fact that correlation did not
+imply causation. Furthermore, we did not think through what data we can
+access, how to combine the data together, and other confounding factors in
+our model. If we had thought clearly through our entire problem statement
+and formulated a plan of attack, then given the limitation of the Yelp API,
+we might have changed our project to be geared towards other APIs or data
+sets that could give us a picture of the entirety of San Francisco.
+
+\subsection{Let the Data Speak}
+
+Having a clear problem statement, however, does not mean assuming a certain
+hypothesis before we see the data. In this project, we realized that we had
+held our hypothesis as fact throughout the course of most of our
+investigation. A lot of our plans to visualize the data, for example, were
+made before we even looked at the data, and they were made to show that a
+correlation did indeed exist. On a similar note, if we could had tried to
+get the data and conduct the tests of significance first, we would have
+realized the problem with correlations vs. causation earlier on, and that
+would have given us more leeway in planning our next steps.
+
+\subsection{The Yelp API}
+
+The Yelp API was a huge problem for us in this project. There were multiple
+issues with it. First, and most importantly, was that we couldn't get a
+evenly distributed sample of restaurants in San Francisco. Ideally, we
+would be able to get the entire data set of all restaurants in San
+Francisco, but even if that was not possible, an truly random sample of the
+restaurants in San Francisco would have been much nicer. If we had this
+data, we would then be able to correlate restaurants with location without
+any bias, and then we could use any location-based data in our model (such
+as population density). The way we were forced to access data meant that we
+were only able to find restaurants that were near crimes in the first
+place. This makes our data set inherently biased. Given this bias, we were
+only able to analyze the data in a particular way (compare near-crime
+restaurants vs. the general population of restaurants).
+
+Because of this limitation, we had to use the academic data set as a
+representative sample of the entire Yelp restaurant population. Because the
+academic data set was of restaurants outside of San Francisco, this posed
+two major problems:
+\begin{enumerate}
+\item All the data we obtained for other purposes do not pertain to the
+  academic data set. Because of this, we could only use the academic data
+  set in a separate analysis from all the other data with which we were
+  working.
+\item The academic data set is not necessarily a representative sample of
+  the entire Yelp restaurant population. For one thing, it's just a sample
+  of the closest 250 businesses to certain universities. Aside from the
+  fact that businesses near universities themselves may be biased, the fact
+  that the data set spans different cities may be bias in itself. San
+  Francisco's restaurant rating distribution may vary highly from those of
+  Berkeley, Stanford, Los Angeles etc.
+\end{enumerate}
+
+Furthermore, we also had technical issues with the Yelp API. We had found
+many bugs in the Yelp API and sample code, both of which were no longer
+maintained. Aside from the authentication bug mentioned, the Yelp API also
+had issues handling Unicode. Data fetching was tedious and marginally
+better than scraping at best. Furthermore, the API lacked some of the
+properties displayed on the website such as price range (denoted by a
+number of dollar signs from 1 to 4). Characteristics like this may have
+been better correlated with crime density, or would at least have given us
+a clearer picture of the reason behind why our hypothesis was
+wrong. Keyword search with location was also a strange idea, because due to
+the way search is implemented there are necessarily restaurants that may
+not be included in a search result (false negatives in the
+search). Usually, for the purposes of a human user, this would not be a
+problem, but if the search filters out actual restaurants because it
+doesn't match the keyword as well, then this process introduces bias into
+our data. Finally, in hindsight, Yelp rating data was too limited to be
+informative. The API only provides rating data accurate to 0.5 increments,
+so there are only a total of 10 different ratings a restaurant could
+have. We had asked Yelp developers through email to provide us with a
+separate data set with more resolution in ratings, but they weren't able to
+provide us with anything.
+
+\subsection{Causation}
+
+As mentioned above, our biggest problem by the end of the project was that,
+given the data we could access and the limitations we had, we weren't able
+to show causation or lack thereof. This is partly because we didn't have a
+clear problem statement to begin with, but is also because we didn't have
+the statistical background to think rigorously about the process by which
+we do data science, and the implications of finding a correlation. We also
+didn't realize that confounding factors were something that almost
+definitely had to account for, as our original plan was just to predict
+crime density using restaurant ratings by utilizing machine learning.
+
+% -- causation and correlation
+% -- tract difficulties
+% -- clear problem statement
+% ----> not our fault, more because we didn't have experience with data
+% science projects and no proper guidance
+% -- problems with the data (not sure where it's from)
+% -- don't draw conclusions before the results are out
+% -- note about Yelp data not having ``price'' characteristic
+% -- academic data set biased
+% -- keyword match problems
+
+% -- IMPORTANT: COULD NOT GET CITY WIDE DATASET EASILY, so resort to strange
+% / weird separate tests
+% ----> no such thing as ``city-wide average''
+% ----> can't predict for rest of SF yelp data set because can't access
+% ----> should have gotten Yelp rating per tract / area so can compare with
+% crime density and population density per tract
+
+% -- must stress, given the limitations we did pretty well
+
+-- unfortunately couldn't show causation but good idea of why
 
 \bibliographystyle{IEEEtran}
 \bibliography{writeup-bibliography}
