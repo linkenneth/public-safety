@@ -4,7 +4,7 @@
 \usepackage{hyperref}
 \usepackage{amssymb}
 
-\title{Yelp and Crime}  % TODO
+\title{Yelp Ratings and Crime Distribution}
 \author{Kenneth Lin, Sid Naik, Tom McCormick}
 \date{\today}
 
@@ -35,12 +35,6 @@ wealth and ``goodness'' of that neighborhood. Therefore, we had conjectured
 that crime would negatively impact restaurant ratings, or that low
 restaurant ratings would be correlated with areas of high crime. We worked
 to show this throughout our project.
-
-% At first, we explored each data set individually to discover general
-% patterns in the data set. After that, we delved into our main problem. We
-% are interested in the relationship (if any) between the quality of
-% restaurants and the frequency and severity of crime. In particular, we
-% wanted to know
 
 In particular, we wanted to know
 \begin{itemize}
@@ -153,7 +147,7 @@ well. In particular, we could only access 20 results at a time, and a
 maximum of 40 total results for searches that sorted the results by only
 distance or rating. With searches not by distance or rating, Yelp enforced
 its own ranking to its results. Results further down the results page
-became so varied that they no longer matched the keyword (for example, Yep
+became so varied that they no longer matched the keyword (for example, Yelp
 may provide a gym even though ``food'' was specified simply because the gym
 was much closer than any other ``food'' locations). All of the above
 limited the ways in which we could obtain and analyze Yelp data.
@@ -190,28 +184,33 @@ that we installed on our EC2 server.
 
 \subsection{Visualization}
 
-After fetching the data, % TODO
+After fetching the data, we wanted to explore the nature of each data set
+first. A lot of the data is location-based, so the natural next step was to
+visualize, either via heatmap or plots on a map, the spatial distribution
+of restaurants or crimes. After testing around, we decided to create a
+heatmap for crime density and a plot of Yelp ratings.
 
 To create the heatmap for crime density, we took the map and created a 100
 x 100 grid where we assigned a value to each spot on the grid based on the
-amount of crimes in the area. We used the numpy module gaussian\_kde to help
-us accomplish this. Then we exported this data structure as a csv with
-fields longitude, latitude, and density. Then using heatmap.js, a
-javascript library, we were able to create a heatmap layer over the Google
-map, which we got using the Google maps API, of the region.
+amount of crimes in the area. We calculated a normal distribution at each
+crime location to create a Gaussian kernel density estimator, and
+calculated the final values of the KDE at each of the 10000 points. Then,
+we exported this data structure as a CSV with fields longitude, latitude,
+and density. Then, using heatmap.js, a JavaScript library, we were able to
+create a heatmap layer over the Google Map, which we got using the Google
+Maps API, of the region.
 
-To create the plot of the yelp data, we had to first get our data in a csv
-file with the fields longitude, latitude, and density. Once these fields
-were found, we used the d3 library in javascript to plot circles on a
-Google map based on their rating with red being every data point in the
-95th percentile, yellow 75th percentile, green 50th percentile, and
-elsewhere blue.
+To create the plot of the average Yelp rating for crimes, we had to first
+get our data in a CSV file with the fields longitude, latitude, and
+density. Once these fields were found, we used the D3 library in JavaScript
+to plot circles on a Google Map based on their rating. We used the colors
+red, yellow, green and blue for each of the four quartiles. Lastly, to
+create the last plot of just the restaurants that were near crime, the
+method was very similar to the plot of all the Yelp ratings, except that
+the amount of data was less and the gradient was slightly different.
 
-Lastly to create the last plot of the near crime data, the method was very
-similar to the plot of all the Yelp ratings, except that the amount of data
-was less and the gradient was slightly different being: ratings > 4.5 :
-black, ratings = 4.5: red, ratings >=4: gold, ratings >=3.5: green, other:
-blue.
+The results of the visualizations can be seen in the
+\textbf{\nameref{sec:results}} section.
 
 \subsection{Looking for Correlations}
 
@@ -270,9 +269,6 @@ In an effort to learn why our hypothesis was wrong, we began considering
 confounding factors. The two heatmaps we created seem to indicate that
 population density was key.
 
-% TODO snapshot of the data?
-
-
 To gather the data on population density, we found a database file (.dbf)
 from \url{data.sfgov.org} that contained a table that mapped tract (a unit
 of area used by the census) to population density. We were also able to
@@ -283,13 +279,13 @@ and then joining the population-density-by-tract-table on tract, we could
 estimate which tract each restaurant or crime was in, and find an
 associated population density for a restaurant or crime. The result allowed
 us to look for a possible correlation between crime density and population
-density.
+density. The data sets looked like the following:
 \begin{center}
-  \includegraphics[scale=0.5]{raw_popdensitydata.png} \\
-  \includegraphics[scale=0.5]{tract_raw_data.png} \\
-  \includegraphics[scale=0.5]{full_population_density.png} \\
+  \includegraphics[scale=0.7]{raw_popdensitydata.png} \\
+  Figure 2: Sample of population density data set
 
-  Figure 1: Screen shots of population density data and tract data as well as final joined table of crime and population density
+  \includegraphics[scale=0.7]{tract_raw_data.png} \\
+  Figure 3: Sample of census tract data set
 \end{center}
 
 One difficulty we had with integrating this data was that the data was
@@ -341,19 +337,32 @@ hotspots.
 
 \subsection{Visualizations}
 
+Below are the visualizations we created from the two data sets.
+
 \begin{center}
   \includegraphics[keepaspectratio=true, width=350px]{crime_density_heatmap.png}
-  Figure 2: Heatmap of crime density \\[20pt]
+  Figure 4: Heatmap of crime density \\[20pt]
 
   \includegraphics[keepaspectratio=true, width=350px]{all_yelp_ratings_plotted.jpg}
-  Figure 3: Plot of ``average Yelp rating of crimes''. Each point
+  Figure 5: Plot of ``average Yelp rating of crimes''. Each point
   corresponds to a crime, and the color corresponds to the average rating
   of the closest 20 restaurants to that crime. \\[20pt]
 
   \includegraphics[keepaspectratio=true, width=350px]{unique_yelp_rating_plot.jpg}
-  Figure 5: Plot of Yelp ratings for restaurants in the near-crime data
+  Figure 6: Plot of Yelp ratings for restaurants in the near-crime data
   set. Black = 5.0; red = 4.5; yellow = 4.0; green = 3.5; blue = 3.0 \\[20pt]
 \end{center}
+
+As can be seen, crime seemed to be clustered near Market Street. The plot
+of ``average Yelp rating of crimes'' is also telling -- a significant
+number of crimes were close to highly rated restaurants, especially along
+Market Street, near Fisherman's Wharf, and down to Bernal Heights and
+Balboa Park. Although the number of unique restaurants fetched makes it
+difficult to see the same correlation with the plot of just restaurants, it
+it is still easy to see that the majority of restaurants that are
+``inland'' are decently rated, compared to those that were on the East or
+South side of San Francisco. These plots aided in us drawing our
+conclusions from the t-test we performed.
 
 \subsection{Putting it together}
 
@@ -393,11 +402,11 @@ a better picture of the actual distribution of each data set.
 
 \begin{center}
   \includegraphics[keepaspectratio=true, width=320px]{boxplot.png}
-  Figure 2: Box-and-whiskers plot of distribution of the ratings of
+  Figure 7: Box-and-whiskers plot of distribution of the ratings of
   different data sets \\[20pt]
 
   \includegraphics[keepaspectratio=true, width=320px]{scatter_plot.png}
-  Figure 3: Scatter plot of distribution of the ratings of different data
+  Figure 8: Scatter plot of distribution of the ratings of different data
   sets. Points plotted with certain randomness to show distribution of
   points. \\[20pt]
 \end{center}
@@ -583,9 +592,18 @@ the statistical background to think rigorously about the process by which
 we do data science, and the implications of finding a correlation. We also
 didn't realize that confounding factors were something that almost
 definitely had to account for, as our original plan was just to predict
-crime density using restaurant ratings by utilizing machine learning.
+crime density using restaurant ratings by utilizing machine learning. In
+the end, we didn't have the data or tools necessary to show causation in
+either direction. However, we learned interesting correlations along the
+way.
 
--- unfortunately couldn't show causation but good idea of why
+\section{Conclusion}
+
+Unfortunately, we weren't able to show any definitive causation between
+Yelp ratings and crime. However, we were able to find a significant
+correlation between the two, as well as between each of them and population
+density. Further work into investigating these correlations could prove to
+be very interesting and beneficial.
 
 \bibliographystyle{IEEEtran}
 \bibliography{writeup-bibliography}
