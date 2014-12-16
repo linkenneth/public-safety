@@ -59,14 +59,13 @@ in the \textbf{\nameref{sec:lessons-learned}} section.
 
 \subsection{City of San Francisco Public Safety Data Set}
 
-The City of San Francisco public safety data set is a record, written by the
-San Francisco Police Department, of incoming incident reports, either via
-phone call, in person, or otherwise. The incidents are reported via the
-SFPD CABLE crime incident reporting system. The incidents are reported over
-the course of more than 11 years, from 1/1/2003 to present. Incidents are
-recorded when a police report is filled out during or after a crime
-incident. Crimes range from aggravated assault to vandalism to death
-reports.
+The City of San Francisco public safety data set is a record, written by
+the San Francisco Police Department, of incoming incident reports, either
+via phone call, in person, or otherwise. These incidents, reported via the
+SFPD CABLE crime incident reporting system, cover the span of more than 11
+years, from 1/1/2003 to present. Incidents are recorded when a police
+report is filled out during or after a crime incident. Crimes range from
+aggravated assault to vandalism to death reports.
 
 A sample of records in the data set looks like the following:
 
@@ -123,8 +122,6 @@ a perfect sample of the entire Yelp data set, and that its average is
 indicative of the Yelp-wide average. Issues with this assumption will be
 addressed in the \textbf{\nameref{sec:lessons-learned}} section.
 
--- basic analysis
-
 \section{Methods}
 
 \subsection{Data Fetching}
@@ -154,9 +151,28 @@ We also encountered other problems in data fetching. In addition to the
 bugs in the API, there were rate limiting and quantity limiting issues as
 well. In particular, we could only access 20 results at a time, and a
 maximum of 40 total results for searches that sorted the results by only
-distance or rating. This limited the ways in which we could obtain and
-analyze Yelp data.
-% TODO something about some ideas we had
+distance or rating. With searches not purely by distance or rating, Yelp
+enforced its own ranking to its results. Results further down the results
+page became so varied that they no longer matched the keyword (for example,
+Yep may provide a gym even though ``food'' was specified simply because the
+gym was much closer than any other ``food'' locations). All of the above
+limited the ways in which we could obtain and analyze Yelp data.
+
+For us, the ideal way to get Yelp data would be to have a data set
+containing data on every single restaurant in San Francisco. This would
+have been the most ideal solution as
+\begin{enumerate}
+\item we could then \textit{compare} the properties of restaurants near
+  crimes to the general population of restaurants in San Francisco
+  properly. The way we do this instead is to use the academic data set, but
+  that includes data from other cities
+\item the data we had would be the \textit{entire population} of restaurants in San
+  Francisco (that Yelp has in their database)
+\item we could then easily compare any other location-based data (like
+  population density) and determine any confounding factors in our
+  statistical model. This wasn't discovered until after our t-test results.
+\end{enumerate}
+
 Further, we weren't able to get as much data as we needed (because of
 Yelp's rate limiting). However, it was still possible to search for the
 closest restaurants near any location specified by longitude and
@@ -167,7 +183,7 @@ In the end, we were able to build a fault-tolerant work-around to Yelp's
 broken authentication system. We queried Yelp's API for the 20 closest
 restaurants near each crime in the City of San Francisco crime data set for
 a total of 12,000 crimes (9704 unique incidents due to multiple criminal
-offenses per incident). These results were stored in our MongoDB instance
+offenses per incident). These results were stored in the MongoDB instance
 that we installed on our EC2 server.
 
 \subsection{Visualization}
@@ -301,8 +317,58 @@ the academic data set, whereas the ``restaurants only'' data sets filtered
 out only the businesses in the academic data set that had ``Food'' or
 ``Restaurants'' as one of the items in its category field.
 
--- whisker plots
--- scatter plots
+From the p-values of each t-test it is clear that the null hypothesis can
+be rejected, and that the ``near-crime'' data set does not have the same
+average Yelp rating as the other data sets. The following two plots provide
+a better picture of the actual distribution of each data set.
+
+\begin{center}
+  \includegraphics[scale=0.5]{boxplot.png} \\
+  Figure 2: Box-and-whiskers plot of distribution of the ratings of
+  different data sets
+
+  \includegraphics[scale=0.5]{scatter_plot.png} \\
+  Figure 3: Scatter plot of distribution of the ratings of different data
+  sets. Points plotted with certain randomness to show distribution of
+  points.
+\end{center}
+
+However, the data indicates that our initial hypothesis was also wrong --
+we found instead that the restaurants near crimes were actually
+\textit{higher} rated than the general population of restaurants. To us,
+this was extremely counterintuitive. Our original hypothesis was that crime
+would negatively affect restaurant ratings. However, the data seems to show
+that crime was instead positively correlated with ratings. As we were
+looking for explanations, we also realized that the tests we have been
+doing would not prove causation anyways. It's possible that crime
+positively affects restaurant ratings, or that restaurant ratings increase
+the crime rate, but it's also possible that both are correlated with a
+third confounding factor. In particular, from the visualizations we created
+earlier, it's very likely that population density would be a factor. Areas
+near Market Street are known to be the most popular areas in San Francisco,
+for work, shopping, and many other things. As we were not familiar with
+these statistical notions when we formulated our problem statement, we had
+not thought of problems like these when we started.
+
+Due to the limitations of the Yelp API, we could not get Yelp data with an
+even distribution across all of San Francisco. Given what we had, we wanted
+to compare the population density of the areas of near-crime restaurants to
+the population density of the restaurants in the other sets. However,
+because our academic data set had restaurants all across the United States
+where we didn't have ready access to population density data, it was
+impossible to calculate population density for these areas. Further,
+population varies more by city than areas within the city, so variations in
+those restaurants are not telling at all.
+
+The best alternative was to instead compare the population density of the
+areas of near-crime restaurants to the total population density of San
+Francisco. Although the results of this test would not be directly related
+to the test performed above, it would provide exploratory insight into the
+reason behind why our hypothesis was wrong.
+
+% TODO why do we go to population density
+
+% TODO where to put correlation vs causation
 
 -- distribution
 -- ratings
@@ -330,6 +396,15 @@ science projects and no proper guidance
 -- note about Yelp data not having ``price'' characteristic
 -- academic data set biased
 -- keyword match problems
+
+-- IMPORTANT: COULD NOT GET CITY WIDE DATASET EASILY, so resort to strange
+/ weird separate tests
+----> no such thing as ``city-wide average''
+----> can't predict for rest of SF yelp data set because can't access
+----> should have gotten Yelp rating per tract / area so can compare with
+crime density and population density per tract
+
+-- must stress, given the limitations we did pretty well
 
 \bibliographystyle{IEEEtran}
 \bibliography{writeup-bibliography}

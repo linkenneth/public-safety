@@ -44,3 +44,28 @@ https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2010-Census-Bl
 
 POPULATION DENSITY DATA LOCATION:
 https://data.sfgov.org/Health-and-Social-Services/Population-Density-San-Francisco-CA/ea9w-4zvc
+
+TOTAL POPULATION DENSITY:
+17143.590729149975
+
+pop of crime data set:
+In [174]: p['PopDensity(sqmi)'].mean()
+Out[174]: 34488.610853467027
+
+In [182]: scipy.stats.ttest_1samp(p['PopDensity(sqmi)'], 17143.590729149975)
+Out[182]: (array(62.834395838188605), 0.0)
+
+In [278]: dunny['PopDensity(sqmi)'].describe()
+Out[278]:
+count       658.000000
+mean      25437.355831
+std       15694.584226
+min         241.117000
+25%       15215.125000
+50%       24461.600000
+75%       31682.400000
+max      142941.000000
+dtype: float64
+
+In [280]: scipy.stats.ttest_1samp(dunny['PopDensity(sqmi)'], 17143.590729149975)
+Out[280]: (array(13.555478819918347), 4.3438026814574012e-37)
